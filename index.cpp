@@ -9,21 +9,19 @@
 #include <algorithm>
 #include <memory>
 
-using namespace std;
-
 // ===============================
 // Classe Publication
 // ===============================
 class Publication {
 private:
-    string contenu;
-    string date;
+    std::string contenu;
+    std::string date;
 
 public:
-    Publication(const string& contenu, const string& date)
+    Publication(const std::string& contenu, const std::string& date)
         : contenu(contenu), date(date) {}
 
-    friend ostream& operator<<(ostream& os, const Publication& p) {
+    friend std::ostream& operator<<(std::ostream& os, const Publication& p) {
         os << "[" << p.date << "] " << p.contenu;
         return os;
     }
@@ -34,19 +32,19 @@ public:
 // ===============================
 class Utilisateur {
 protected:
-    string nom;
-    vector<string> amis;
-    vector<Publication> publications;
+    std::string nom;
+    std::vector<std::string> amis;
+    std::vector<Publication> publications;
 
 public:
-    Utilisateur(const string& nom) : nom(nom) {}
+    Utilisateur(const std::string& nom) : nom(nom) {}
 
-    const string& getNom() const {
+    const std::string& getNom() const {
         return nom;
     }
 
-    Utilisateur& operator+=(const string& ami) {
-        if (find(amis.begin(), amis.end(), ami) == amis.end()) {
+    Utilisateur& operator+=(const std::string& ami) {
+        if (std::find(amis.begin(), amis.end(), ami) == amis.end()) {
             amis.push_back(ami);
         }
         return *this;
@@ -56,18 +54,18 @@ public:
         publications.push_back(p);
     }
 
-    virtual void afficher(ostream& os) const {
+    virtual void afficher(std::ostream& os) const {
         os << "Utilisateur : " << nom << "\n";
         afficherAmisEtPublications(os);
     }
 
-    friend ostream& operator<<(ostream& os, const Utilisateur& u) {
+    friend std::ostream& operator<<(std::ostream& os, const Utilisateur& u) {
         u.afficher(os);
         return os;
     }
 
 protected:
-    void afficherAmisEtPublications(ostream& os) const {
+    void afficherAmisEtPublications(std::ostream& os) const {
         os << "  Amis : ";
         if (amis.empty()) {
             os << "Aucun";
@@ -97,22 +95,22 @@ private:
     int maxAmis;
 
 public:
-    UtilisateurPremium(const string& nom, int maxAmis)
+    UtilisateurPremium(const std::string& nom, int maxAmis)
         : Utilisateur(nom), maxAmis(maxAmis) {}
 
     bool peutAjouterAmi() const {
         return amis.size() < static_cast<size_t>(maxAmis);
     }
 
-    void ajouterAmiPremium(const string& ami) {
+    void ajouterAmiPremium(const std::string& ami) {
         if (peutAjouterAmi()) {
             *this += ami;
         } else {
-            cout << "Limite d'amis atteinte pour " << nom << " !" << endl;
+            std::cout << "Limite d'amis atteinte pour " << nom << " !" << std::endl;
         }
     }
 
-    void afficher(ostream& os) const override {
+    void afficher(std::ostream& os) const {
         os << "Utilisateur Premium : " << nom << "\n";
         os << "  Limite d'amis : " << maxAmis << "\n";
         afficherAmisEtPublications(os);
@@ -124,17 +122,17 @@ public:
 // ===============================
 class ReseauSocial {
 private:
-    vector<unique_ptr<Utilisateur>> utilisateurs;
+    std::vector<std::unique_ptr<Utilisateur>> utilisateurs;
 
 public:
-    void ajouterUtilisateur(unique_ptr<Utilisateur> u) {
-        utilisateurs.push_back(move(u));
+    void ajouterUtilisateur(std::unique_ptr<Utilisateur> u) {
+        utilisateurs.push_back(std::move(u));
     }
 
     void afficherUtilisateurs() const {
-        cout << "===== Utilisateurs =====\n";
+        std::cout << "===== Utilisateurs =====\n";
         for (const auto& u : utilisateurs) {
-            cout << *u << endl;
+            std::cout << *u << std::endl;
         }
     }
 };
@@ -151,8 +149,8 @@ int main() {
     Publication p3("Utilisateur premium ici", "03/01/2025");
 
     // Utilisateurs standards
-    auto u1 = make_unique<Utilisateur>("Alice");
-    auto u2 = make_unique<Utilisateur>("Bob");
+    auto u1 = std::make_unique<Utilisateur>("Alice");
+    auto u2 = std::make_unique<Utilisateur>("Bob");
 
     *u1 += "Bob";
     u1->ajouterPublication(p1);
@@ -161,16 +159,16 @@ int main() {
     u2->ajouterPublication(p2);
 
     // Utilisateur premium
-    auto up1 = make_unique<UtilisateurPremium>("Charlie", 2);
+    auto up1 = std::make_unique<UtilisateurPremium>("Charlie", 2);
     up1->ajouterAmiPremium("Alice");
     up1->ajouterAmiPremium("Bob");
     up1->ajouterAmiPremium("David"); // dépassement
     up1->ajouterPublication(p3);
 
     // Ajout au réseau
-    reseau.ajouterUtilisateur(move(u1));
-    reseau.ajouterUtilisateur(move(u2));
-    reseau.ajouterUtilisateur(move(up1));
+    reseau.ajouterUtilisateur(std::move(u1));
+    reseau.ajouterUtilisateur(std::move(u2));
+    reseau.ajouterUtilisateur(std::move(up1));
 
     // Affichage
     reseau.afficherUtilisateurs();
